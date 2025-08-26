@@ -5,16 +5,25 @@ from generate_map import MapGenerator
 
 class World:
     def __init__(self, world_size=200, seed=random.randint(0, 99999)):
+        random.seed(seed)
         self.size = world_size
         self.seed = seed
         world_generator_object = MapGenerator(world_size, seed)
 
         self.world = world_generator_object.world
         self.world_objects = world_generator_object.world_objects
+        self.fog = [[1 for _ in range(self.size)] for _ in range(self.size)]
         self.block_size = 48
         
-        self.world_objects[100][100] = 4
-
+    def spawn_team(self, team_id):
+        while True:
+            rx, ry = random.randint(1, self.size-1), random.randint(1, self.size-1)
+            if self.world[rx][ry] == 1 and self.world[rx+1][ry] == 1:
+                break
+        self.world_objects[rx][ry] = team_id + 4
+        self.world_objects[rx+1][ry] = 2
+        
+        return rx, ry
 
     def draw(self, window, tl, camera):
         raylib.BeginDrawing()
@@ -28,8 +37,9 @@ class World:
         for x in range(start_x, end_x):
             for y in range(start_y, end_y):
                 
-                    screen_x = x * self.block_size - camera.pos[0]
-                    screen_y = y * self.block_size - camera.pos[1]
+                screen_x = x * self.block_size - camera.pos[0]
+                screen_y = y * self.block_size - camera.pos[1]
+                if self.fog[x][y] != 1:
                     if -self.block_size < screen_x < window.width and -self.block_size < screen_y < window.height:
                         if self.world[x][y] == 1:
                             raylib.DrawRectangle(int(screen_x),
@@ -48,5 +58,13 @@ class World:
                         raylib.DrawTextureEx(tl['water_metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
                     if self.world_objects[x][y] == 4:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.RED)
-
+                    if self.world_objects[x][y] == 5:
+                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.BLUE)
+                    if self.world_objects[x][y] == 6:
+                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.PURPLE)
+                    if self.world_objects[x][y] == 7:
+                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.YELLOW)
+                else:
+                    raylib.DrawTextureEx(tl['fog'], (screen_x, screen_y), 0, 1, raylib.WHITE)
+                    
 
