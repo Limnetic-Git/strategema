@@ -52,7 +52,7 @@ class Camera:
                 for i, unit in enumerate(units_list.units_list):
                     if (selection_left <= unit.x <= selection_right and
                         selection_top <= unit.y <= selection_bottom):
-                        unit.selected = not unit.selected 
+                        unit.selected = True
                     else:
                         if unit.selected:
                             unit.go_to_pos = [world_start_x, world_start_y]
@@ -60,7 +60,10 @@ class Camera:
                 
             if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
                 self.__draw_selection_rect(mouse_pos)
-            
+        if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
+            for unit in units_list.units_list:
+                if unit.selected:
+                    unit.selected = False
                 
     def __draw_selection_rect(self, mouse_pos):
         for i in range(5):

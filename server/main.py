@@ -4,7 +4,6 @@ from _thread import *
 
 players = []
 
-
 def TCPThread(connection):
     players.append({'id': len(players)})
     while True:

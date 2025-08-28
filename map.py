@@ -1,10 +1,11 @@
 import raylib
 import random
 from generate_map import MapGenerator
+from units import *
 
 
 class World:
-    def __init__(self, world_size=200, seed=random.randint(0, 99999)):
+    def __init__(self, world_size=256, seed=random.randint(0, 99999)):
         random.seed(seed)
         self.size = world_size
         self.seed = seed
@@ -12,20 +13,24 @@ class World:
 
         self.world = world_generator_object.world
         self.world_objects = world_generator_object.world_objects
-        self.fog = [[1 for _ in range(self.size)] for _ in range(self.size)]
         self.block_size = 48
         
-    def spawn_team(self, team_id):
+    def spawn_team(self, team_id: int):
         while True:
             rx, ry = random.randint(1, self.size-1), random.randint(1, self.size-1)
             if self.world[rx][ry] == 1 and self.world[rx+1][ry] == 1:
                 break
         self.world_objects[rx][ry] = team_id + 4
         self.world_objects[rx+1][ry] = 2
-        
         return rx, ry
+    
+    def spawn_teams(self, team_number: int, player, units_list):
+        for i in range(team_number):
+            bx, by = self.spawn_team(i)
+            if i == player.team: player.capital_cords = [bx, by]
+            units_list.add(Scout(bx*48, by*48, i))
 
-    def draw(self, window, tl, camera):
+    def draw(self, window, tl, camera, player):
         raylib.BeginDrawing()
         raylib.ClearBackground(raylib.BLUE)
 
@@ -39,9 +44,9 @@ class World:
                 
                 screen_x = x * self.block_size - camera.pos[0]
                 screen_y = y * self.block_size - camera.pos[1]
-                if self.fog[x][y] != 1:
+                if player.load_zone[x][y] != [None, None]:
                     if -self.block_size < screen_x < window.width and -self.block_size < screen_y < window.height:
-                        if self.world[x][y] == 1:
+                        if player.load_zone[x][y][0] == 1:
                             raylib.DrawRectangle(int(screen_x),
                                                 int(screen_y),
                                                 int(self.block_size),
@@ -50,20 +55,27 @@ class World:
                                                 )
                             raylib.DrawRectangleLines(int(screen_x), int(screen_y), int(self.block_size), int(self.block_size), raylib.BLACK)
                             
-                    if self.world_objects[x][y] == 1:
+                    if player.load_zone[x][y][1] == 1:
                         raylib.DrawTextureEx(tl['tree'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if self.world_objects[x][y] == 2:
+                    if player.load_zone[x][y][1] == 2:
                         raylib.DrawTextureEx(tl['metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if self.world_objects[x][y] == 3:
+                    if player.load_zone[x][y][1] == 3:
                         raylib.DrawTextureEx(tl['water_metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if self.world_objects[x][y] == 4:
+                    if player.load_zone[x][y][1] == 4:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.RED)
-                    if self.world_objects[x][y] == 5:
+                    if player.load_zone[x][y][1] == 5:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.BLUE)
-                    if self.world_objects[x][y] == 6:
+                    if player.load_zone[x][y][1] == 6:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.PURPLE)
-                    if self.world_objects[x][y] == 7:
+                    if player.load_zone[x][y][1] == 7:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.YELLOW)
+                        
+                    if player.fog[x][y] == 1:
+                        raylib.DrawRectangle(int(screen_x),
+                            int(screen_y),
+                            int(self.block_size),
+                            int(self.block_size),
+                            [50, 50, 50, 100])
                 else:
                     raylib.DrawTextureEx(tl['fog'], (screen_x, screen_y), 0, 1, raylib.WHITE)
                     
