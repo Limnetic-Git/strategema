@@ -7,9 +7,9 @@ class UnitsList:
         self.units_list = []
         
 
-    def draw_all(self, camera, world, player):
+    def draw_all(self, camera, world, loaded_map):
         for unit in self.units_list:
-            unit.draw(camera, world, player)
+            unit.draw(camera, world, loaded_map)
     
     def add(self, unit):
         self.units_list.append(unit)
@@ -30,7 +30,7 @@ class Unit:
         self.selected = False
         self.go_to_pos = [None, None]
     
-    def update(self, world, player):
+    def update(self, world, loaded_map):
         if self.go_to_pos != [None, None] and self.go_to_pos != [self.x, self.y]:
             dx = self.go_to_pos[0] - self.x
             dy = self.go_to_pos[1] - self.y
@@ -48,17 +48,17 @@ class Unit:
                     
                 if abs(self.x - self.go_to_pos[0]) <= 1 and abs(self.y - self.go_to_pos[1]) <= 1:
                     self.x, self.y = self.go_to_pos
-        self.vision(world, player)
+        self.vision(world, loaded_map)
         
-    def vision(self, world, player):
+    def vision(self, world, loaded_map):
         bx, by = self.x // 48, self.y // 48
         for i in [-1, 1]:
             for k in [-1, 1]:
                 for j in range(5):
                     for u in range(5):
                         x, y = bx + (j*i), by + (u*k)
-                        player.load_zone[x][y] = [world.world[x][y], world.world_objects[x][y]]
-                        player.fog[x][y] = 0
+                        loaded_map.load_world[x][y] = [world.world[x][y], world.world_objects[x][y]]
+                        loaded_map.now_loaded[x][y] = 0
                         
 class Scout(Unit):
     def __init__(self, x, y, team):
@@ -66,7 +66,7 @@ class Scout(Unit):
                                   damage_to_buildings=5, fire_rate=0.75, speed=1,
                                   type_of_movement='land')
         
-    def draw(self, camera, world, player):
+    def draw(self, camera, world, loaded_map):
         color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
         raylib.DrawCircle(self.x - camera.pos[0], self.y - camera.pos[1], 10, color[self.team])
         if self.selected:
@@ -75,5 +75,5 @@ class Scout(Unit):
                     raylib.DrawCircleLines(self.x - camera.pos[0], self.y - camera.pos[1], 10 - i, raylib.YELLOW)
                 else:
                     raylib.DrawCircleLines(self.x - camera.pos[0], self.y - camera.pos[1], 10 - i, raylib.BLACK)
-        super().update(world, player)
+        super().update(world, loaded_map)
         

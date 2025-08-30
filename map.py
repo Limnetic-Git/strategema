@@ -30,7 +30,7 @@ class World:
             if i == player.team: player.capital_cords = [bx, by]
             units_list.add(Scout(bx*48, by*48, i))
 
-    def draw(self, window, tl, camera, player):
+    def draw(self, window, tl, camera, loaded_map):
         raylib.BeginDrawing()
         raylib.ClearBackground(raylib.BLUE)
 
@@ -44,9 +44,9 @@ class World:
                 
                 screen_x = x * self.block_size - camera.pos[0]
                 screen_y = y * self.block_size - camera.pos[1]
-                if player.load_zone[x][y] != [None, None]:
+                if loaded_map.load_world[x][y] != [None, None]:
                     if -self.block_size < screen_x < window.width and -self.block_size < screen_y < window.height:
-                        if player.load_zone[x][y][0] == 1:
+                        if loaded_map.load_world[x][y][0] == 1:
                             raylib.DrawRectangle(int(screen_x),
                                                 int(screen_y),
                                                 int(self.block_size),
@@ -55,22 +55,22 @@ class World:
                                                 )
                             raylib.DrawRectangleLines(int(screen_x), int(screen_y), int(self.block_size), int(self.block_size), raylib.BLACK)
                             
-                    if player.load_zone[x][y][1] == 1:
+                    if loaded_map.load_world[x][y][1] == 1:
                         raylib.DrawTextureEx(tl['tree'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if player.load_zone[x][y][1] == 2:
+                    if loaded_map.load_world[x][y][1] == 2:
                         raylib.DrawTextureEx(tl['metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if player.load_zone[x][y][1] == 3:
+                    if loaded_map.load_world[x][y][1] == 3:
                         raylib.DrawTextureEx(tl['water_metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if player.load_zone[x][y][1] == 4:
+                    if loaded_map.load_world[x][y][1] == 4:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.RED)
-                    if player.load_zone[x][y][1] == 5:
+                    if loaded_map.load_world[x][y][1] == 5:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.BLUE)
-                    if player.load_zone[x][y][1] == 6:
+                    if loaded_map.load_world[x][y][1] == 6:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.PURPLE)
-                    if player.load_zone[x][y][1] == 7:
+                    if loaded_map.load_world[x][y][1] == 7:
                         raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.YELLOW)
                         
-                    if player.fog[x][y] == 1:
+                    if loaded_map.now_loaded[x][y] == 1:
                         raylib.DrawRectangle(int(screen_x),
                             int(screen_y),
                             int(self.block_size),
