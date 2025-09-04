@@ -29,7 +29,7 @@ class Camera:
             self.default_focus = [(window.width // 2) // world.block_size, (window.height // 2) // world.block_size]
         self.pos = [world.block_size * (block_x - self.default_focus[0]), world.block_size * (block_y - self.default_focus[1])]
     
-    def select(self, units_list):
+    def select(self, units_list, player):
         if not raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_MIDDLE):
             mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
             if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
@@ -50,13 +50,18 @@ class Camera:
                 selection_bottom = max(world_start_y, world_end_y)
                 
                 for i, unit in enumerate(units_list.units_list):
-                    if (selection_left <= unit.x <= selection_right and
-                        selection_top <= unit.y <= selection_bottom):
-                        unit.selected = True
-                    else:
-                        if unit.selected:
-                            unit.go_to_pos = [world_start_x, world_start_y]
-
+                    if unit.team == player.team:
+                        if (selection_left <= unit.x <= selection_right and
+                            selection_top <= unit.y <= selection_bottom):
+                                unit.selected = True
+                        else:
+                            if unit.selected:
+                                if mouse_pos[1] < 850:
+                                    unit.go_to_pos = [world_start_x, world_start_y]
+                                else:
+                                    if mouse_pos[0] > 500:
+                                        unit.go_to_pos = [world_start_x, world_start_y]
+                                    
                 
             if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
                 self.__draw_selection_rect(mouse_pos)

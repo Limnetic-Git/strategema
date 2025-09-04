@@ -15,14 +15,16 @@ class ActionButton:
         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
             xm, ym = raylib.GetMouseX(), raylib.GetMouseY()
             if xm >= self.x and xm <= self.x + self.texture.width and ym >= self.y and ym <= self.y + self.texture.height:
-                print('!')
+                print(self.action)
             
 class ActionBar:
     def __init__(self, tl):
         self.page = 0
         self.pages_info = [
-            [ActionButton(65, 900, tl['city'], 0)], # <--- ГЛАВНАЯ СТРАНИЦА
-            ]
+            [ActionButton(65, 900, tl['city'], 0), # <--- ГЛАВНАЯ СТРАНИЦА
+             ActionButton(135, 900, tl['factory'], 1)
+            ], 
+                                  ]
         
     def draw(self):
         #raylib.DrawRectangle(15, 850, 500, 280, (28, 28, 28))

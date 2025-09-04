@@ -7,10 +7,13 @@ class UnitsList:
         self.units_list = []
         
 
-    def draw_all(self, camera, world, loaded_map):
+    def draw_all(self, camera, world, loaded_map, player):
         for unit in self.units_list:
-            unit.draw(camera, world, loaded_map)
-    
+            unit.draw(camera, world, loaded_map, player)
+    def update_all(self, world, loaded_map, player):
+        for unit in self.units_list:
+            unit.update(world, loaded_map, player)
+                   
     def add(self, unit):
         self.units_list.append(unit)
             
@@ -30,13 +33,13 @@ class Unit:
         self.selected = False
         self.go_to_pos = [None, None]
     
-    def update(self, world, loaded_map):
+    def update(self, world, loaded_map, player):
         if self.go_to_pos != [None, None] and self.go_to_pos != [self.x, self.y]:
             dx = self.go_to_pos[0] - self.x
             dy = self.go_to_pos[1] - self.y
             distance = math.hypot(dx, dy)
             
-            if distance > 0:
+            if distance > 2:
                 if not hasattr(self, '_move_accumulator_x'):
                     self._move_accumulator_x, self._move_accumulator_y = 0.0, 0.0
                 self._move_accumulator_x += (dx / distance) * self.speed
@@ -48,32 +51,27 @@ class Unit:
                     
                 if abs(self.x - self.go_to_pos[0]) <= 1 and abs(self.y - self.go_to_pos[1]) <= 1:
                     self.x, self.y = self.go_to_pos
-        self.vision(world, loaded_map)
-        
-    def vision(self, world, loaded_map):
-        bx, by = self.x // 48, self.y // 48
-        for i in [-1, 1]:
-            for k in [-1, 1]:
-                for j in range(5):
-                    for u in range(5):
-                        x, y = bx + (j*i), by + (u*k)
-                        loaded_map.load_world[x][y] = [world.world[x][y], world.world_objects[x][y]]
-                        loaded_map.now_loaded[x][y] = 0
+        if self.team == player.team:
+            loaded_map.load(world, self.x, self.y, 5)
+
                         
 class Scout(Unit):
     def __init__(self, x, y, team):
         super().__init__(x=x, y=y, team=team, name='Scout', hp=100, damage_to_units=10,
-                                  damage_to_buildings=5, fire_rate=0.75, speed=1,
+                                  damage_to_buildings=5, fire_rate=0.75, speed=5,
                                   type_of_movement='land')
         
-    def draw(self, camera, world, loaded_map):
+    def draw(self, camera, world, loaded_map, player):
         color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
-        raylib.DrawCircle(self.x - camera.pos[0], self.y - camera.pos[1], 10, color[self.team])
-        if self.selected:
-            for i in range(2):
-                if self.team != 3:
-                    raylib.DrawCircleLines(self.x - camera.pos[0], self.y - camera.pos[1], 10 - i, raylib.YELLOW)
-                else:
-                    raylib.DrawCircleLines(self.x - camera.pos[0], self.y - camera.pos[1], 10 - i, raylib.BLACK)
-        super().update(world, loaded_map)
+        bx, by = self.x // 48, self.y // 48
+       
+        if loaded_map.now_loaded[bx][by] == 0:
+            raylib.DrawCircle(self.x - camera.pos[0], self.y - camera.pos[1], 10, color[self.team])
+            if self.selected:
+                for i in range(2):
+                    if self.team != 3:
+                        raylib.DrawCircleLines(self.x - camera.pos[0], self.y - camera.pos[1], 10 - i, raylib.YELLOW)
+                    else:
+                        raylib.DrawCircleLines(self.x - camera.pos[0], self.y - camera.pos[1], 10 - i, raylib.BLACK)
+
         
