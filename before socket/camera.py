@@ -53,11 +53,8 @@ class Camera:
                     if unit.team == player.team:
                         if (selection_left <= unit.x <= selection_right and
                             selection_top <= unit.y <= selection_bottom):
-                                if not unit.id in units_list.selected_units_ids:
-                                    units_list.selected_units_ids.append(unit.id)
                                 unit.selected = True
-                                
-                        elif False: # НА ПОТОМ (направление юнита)
+                        else:
                             if unit.selected:
                                 if mouse_pos[1] < 850:
                                     unit.go_to_pos = [world_start_x, world_start_y]
@@ -71,9 +68,7 @@ class Camera:
         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
             for unit in units_list.units_list:
                 if unit.selected:
-                    units_list.selected_units_ids = []
                     unit.selected = False
-                    
                 
     def __draw_selection_rect(self, mouse_pos):
         for i in range(5):

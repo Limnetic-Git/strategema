@@ -24,10 +24,11 @@ class World:
         self.world_objects[rx+1][ry] = 2
         return rx, ry
     
-    def spawn_teams(self, team_number: int, player):
+    def spawn_teams(self, team_number: int, player, units_list):
         for i in range(team_number):
             bx, by = self.spawn_team(i)
             if i == player.team: player.capital_cords = [bx, by]
+            units_list.add(Scout(bx*48, by*48, i))
 
     def draw(self, window, tl, camera, loaded_map):
         raylib.BeginDrawing()
