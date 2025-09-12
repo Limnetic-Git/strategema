@@ -29,7 +29,7 @@ class Camera:
             self.default_focus = [(window.width // 2) // world.block_size, (window.height // 2) // world.block_size]
         self.pos = [world.block_size * (block_x - self.default_focus[0]), world.block_size * (block_y - self.default_focus[1])]
     
-    def select(self, units_list, player):
+    def select(self, units_list, player, client_socket):
         if not raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_MIDDLE):
             mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
             if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
@@ -57,15 +57,17 @@ class Camera:
                                     units_list.selected_units_ids.append(unit.id)
                                 unit.selected = True
                                 
-                        elif False: # НА ПОТОМ (направление юнита)
+                        else: 
                             if unit.selected:
                                 if mouse_pos[1] < 850:
-                                    unit.go_to_pos = [world_start_x, world_start_y]
+                                    client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'unit_id': unit.id,
+                                                                                'x': world_start_x, 'y': world_start_y})    
+                                    client_socket.tasks_id_counter += 1
                                 else:
                                     if mouse_pos[0] > 500:
-                                        unit.go_to_pos = [world_start_x, world_start_y]
-                                    
-                
+                                        client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'unit_id': unit.id,
+                                                                                  'x': world_start_x, 'y': world_start_y})                                    
+                                        client_socket.tasks_id_counter += 1
             if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
                 self.__draw_selection_rect(mouse_pos)
         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):

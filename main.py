@@ -37,7 +37,7 @@ while not raylib.WindowShouldClose():
 
 
     camera.drag_to_move(window, world) #позволяет камере перемещаться на СКМ
-    camera.select(units_list, player) #позволяет выделять юнитов
+    camera.select(units_list, player, client_socket) #позволяет выделять юнитов
     action_bar.draw() #рисует панельку gui слева-снизу
     
     raylib.EndDrawing()
