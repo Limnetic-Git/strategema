@@ -16,6 +16,10 @@ class UnitsList:
             del dict_['speed']
             del dict_['type_of_movement']
             del dict_['go_to_pos']
+            if '_move_accumulator_x' in dict_:
+                del dict_['_move_accumulator_x']
+            if '_move_accumulator_y' in dict_:
+                del dict_['_move_accumulator_y']
             pack.append(dict_)
         return pack
     

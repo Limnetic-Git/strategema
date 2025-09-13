@@ -39,10 +39,10 @@ def UDPThread():
         incoming_pack, addr = UDPChannel.receive(2048, raw=True)
         pack = str(units_list.pack_units_list())
         UDPChannel.send(addr, f'{pack}')
-    
 
-TCPChannel = pysocknet.TCPServerConnection('127.0.0.1', 1234)
-UDPChannel = pysocknet.UDPServerConnection('127.0.0.1', 1235)
+
+TCPChannel = pysocknet.TCPServerConnection('89.110.90.193', 1234)
+UDPChannel = pysocknet.UDPServerConnection('89.110.90.193', 1235)
 
 
 start_new_thread(TCPChannel.start_client_accepting_loop, (TCPThread,))

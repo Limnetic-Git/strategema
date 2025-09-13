@@ -1,6 +1,7 @@
 import pysocknet
 from _thread import *
 
+
 class ClientConnection:
     def __init__(self, ip, port):
         self.TCPChannel = pysocknet.TCPClientConnection(ip, port)
@@ -24,15 +25,23 @@ class ClientConnection:
         while True:
             tasks_pack = self.tasks.copy()
             pack = {'id': self.id, 'tasks': tasks_pack}
+            if tasks_pack != []:
+                print(pack)
             self.TCPChannel.send(f'{pack}')
             incoming_pack = self.TCPChannel.receive(20480, raw=True)
+
             self.tasks = ([] if self.tasks == tasks_pack else self.tasks)
             
     def UDPThread(self):
         while True:
-            self.UDPChannel.send('Hello! My name is Client (UDP)')
-            self.units_dict = self.UDPChannel.receive(204800, raw=False)
+            try:
+                self.UDPChannel.send('Hello! My name is Client (UDP)')
+                incoming_pack = self.UDPChannel.receive(204800, raw=False)
+                if incoming_pack != None:
+                    self.units_dict = incoming_pack
+            except:
+                pass
 
-    
+
 
 

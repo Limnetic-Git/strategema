@@ -13,7 +13,7 @@ import time
 
 
 window = Window(1600, 1000) #создаёт окно X на Y пикселей (см. window.py)
-client_socket = ClientConnection('127.0.0.1', 1234)
+client_socket = ClientConnection('89.110.90.193', 1234)
 world = World(seed=client_socket.world_seed) #создаёт мир по дефолту на рандомном сиде и с размером 256 на 256 (cм. map.py)
 print(world.seed)
 camera = Camera() #создаёт камеру которую можно двигать зажимая СКМ, а также выделять юнитов (см. camera.py)
