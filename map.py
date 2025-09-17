@@ -61,13 +61,13 @@ class World:
                     if loaded_map.load_world[x][y][1] == 3:
                         raylib.DrawTextureEx(tl['water_metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
                     if loaded_map.load_world[x][y][1] == 4:
-                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.RED)
+                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.RED)
                     if loaded_map.load_world[x][y][1] == 5:
-                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.BLUE)
+                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.BLUE)
                     if loaded_map.load_world[x][y][1] == 6:
-                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.PURPLE)
+                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.PURPLE)
                     if loaded_map.load_world[x][y][1] == 7:
-                        raylib.DrawTextureEx(tl['city'], (screen_x, screen_y), 0, 1, raylib.YELLOW)
+                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.YELLOW)
                         
                     if loaded_map.now_loaded[x][y] == 1:
                         raylib.DrawRectangle(int(screen_x),

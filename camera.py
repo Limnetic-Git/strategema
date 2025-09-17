@@ -7,7 +7,6 @@ class Camera:
         self.is_dragging = False
         self.drag_start_pos = [0, 0]
         self.focus_block = [0, 0]
-        self.default_focus = None
         
     def drag_to_move(self, window, world):
         if not raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
@@ -25,7 +24,7 @@ class Camera:
                 self.drag_start_pos = mouse_pos
     
     def focus_camera_to(self, window, world, block_x, block_y):
-        if self.default_focus == None:
+        if not hasattr(self, 'default_focus'): 
             self.default_focus = [(window.width // 2) // world.block_size, (window.height // 2) // world.block_size]
         self.pos = [world.block_size * (block_x - self.default_focus[0]), world.block_size * (block_y - self.default_focus[1])]
     
@@ -49,7 +48,7 @@ class Camera:
                 selection_top = min(world_start_y, world_end_y)
                 selection_bottom = max(world_start_y, world_end_y)
                 
-                for i, unit in enumerate(units_list.units_list):
+                for _, unit in enumerate(units_list.units_list):
                     if unit.team == player.team:
                         if (selection_left <= unit.x <= selection_right and
                             selection_top <= unit.y <= selection_bottom):

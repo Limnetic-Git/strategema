@@ -39,8 +39,8 @@ class ClientConnection:
                 incoming_pack = self.UDPChannel.receive(204800, raw=False)
                 if incoming_pack != None:
                     self.units_dict = incoming_pack
-            except:
-                pass
+            except Exception as e:
+                print(e)
 
 
 
