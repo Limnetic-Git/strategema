@@ -24,17 +24,18 @@ class ActionBar:
     def __init__(self, tl):
         self.page = 0
         self.pages_info = [
-            [ActionButton(65, 900, tl['city'], 0), # <--- ГЛАВНАЯ СТРАНИЦА
+            [ActionButton(65, 900, tl['city'], 0), # <--- ГЛАВНАЯ СТРАНИЦА (0)
              ActionButton(135, 900, tl['factory'], 1),
              ActionButton(205, 900, tl['sword'], 2),
              ActionButton(275, 900, tl['research'], 3),
             ],
             
-            [ActionButton(65, 900, tl['undo'], 4),
+            [ActionButton(65, 900, tl['undo'], 4),  # <---  МИРНЫЕ ЗДАНИЯ (1)
              ActionButton(135, 900, tl['new_city'], 5),
+             ActionButton(205, 900, tl['field'], 7),
             ],
             
-            [ActionButton(65, 900, tl['undo'], 4),
+            [ActionButton(65, 900, tl['undo'], 4), # <--- ЗАВОДСКИЕ ЗДАНИЯ (2)
              ActionButton(135, 900, tl['mine'], 6),
             ],
                                   ]

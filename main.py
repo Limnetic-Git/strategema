@@ -32,7 +32,7 @@ while not raylib.WindowShouldClose():
     units_list.update(client_socket.units_dict)
     units_list.update_world_load(world, player, loaded_map)
     world.draw(window, tl, camera, loaded_map) #рисует весь мир
-    units_list.draw_all(camera, tl, world, loaded_map, player) #рисует всех юнитов
+    units_list.draw_all(camera, tl, loaded_map) #рисует всех юнитов
 
 
     camera.drag_to_move(window, world) #позволяет камере перемещаться на СКМ

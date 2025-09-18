@@ -14,11 +14,11 @@ class ClientConnection:
         self.id = None
         self.units_dict = None
         
-        start_new_thread(self.TCPThread, (self.TCPChannel,))
+        start_new_thread(self.TCPThread, ())
         start_new_thread(self.UDPThread, ())
         while self.world_seed == None: pass
         
-    def TCPThread(self, connection):
+    def TCPThread(self):
         first_pack = self.TCPChannel.receive(20480, raw=False)
         self.world_seed = first_pack['world_seed']
         self.id = first_pack['id']
@@ -28,7 +28,9 @@ class ClientConnection:
             if tasks_pack != []:
                 print(pack)
             self.TCPChannel.send(f'{pack}')
+            
             incoming_pack = self.TCPChannel.receive(20480, raw=True)
+            
 
             self.tasks = ([] if self.tasks == tasks_pack else self.tasks)
             

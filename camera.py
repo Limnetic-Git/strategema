@@ -22,6 +22,8 @@ class Camera:
                 self.pos[1] += self.drag_start_pos[1] - mouse_pos[1]
                 self.focus_block = [(self.pos[0] + window.width // 2) // world.block_size, (self.pos[1] + window.height // 2) // world.block_size]
                 self.drag_start_pos = mouse_pos
+        #wheel_move = raylib.GetMouseWheelMove()
+   
     
     def focus_camera_to(self, window, world, block_x, block_y):
         if not hasattr(self, 'default_focus'): 
@@ -48,13 +50,12 @@ class Camera:
                 selection_top = min(world_start_y, world_end_y)
                 selection_bottom = max(world_start_y, world_end_y)
                 
-                for _, unit in enumerate(units_list.units_list):
+                for unit in units_list.units_list:
                     if unit.team == player.team:
-                        if (selection_left <= unit.x <= selection_right and
-                            selection_top <= unit.y <= selection_bottom):
-                                if not unit.id in units_list.selected_units_ids:
-                                    units_list.selected_units_ids.append(unit.id)
-                                unit.selected = True
+                        if (selection_left <= unit.x <= selection_right and selection_top <= unit.y <= selection_bottom):
+                            if not unit.id in units_list.selected_units_ids:
+                                units_list.selected_units_ids.append(unit.id)
+                            unit.selected = True
                                 
                         else: 
                             if unit.selected:

@@ -1,15 +1,13 @@
 import raylib
-import random
-import math
 
 class UnitsList:
     def __init__(self):
         self.units_list = []
         self.selected_units_ids = []
         
-    def draw_all(self, camera, tl, world, loaded_map, player):
+    def draw_all(self, camera, tl, loaded_map):
         for unit in self.units_list:
-            unit.draw(camera, tl, world, loaded_map, player)
+            unit.draw(camera, tl, loaded_map)
             
     def update_world_load(self, world, player, loaded_map):
         for unit in self.units_list:
@@ -34,7 +32,7 @@ class Unit:
         
         self.selected = False
 
-    def draw(self, camera, tl, world, loaded_map, player):
+    def draw(self, camera, tl, loaded_map):
         color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
         bx, by = self.x // 48, self.y // 48
             
@@ -43,7 +41,7 @@ class Unit:
                 raylib.DrawTextureEx(tl['scout'], (self.x - camera.pos[0] - 6, self.y - camera.pos[1] - 8), 0, 1.5, color[self.team])
                 #raylib.DrawCircle(self.x - camera.pos[0], self.y - camera.pos[1], 10, color[self.team])
                 if self.selected:
-                    for i in range(2):
+                    for _ in range(2):
                         if self.team != 3:
                             raylib.DrawRectangleLines(int(self.x - camera.pos[0] - 8), int(self.y - camera.pos[1] - 9),
                                                                                 int(24), int(26), raylib.YELLOW)
