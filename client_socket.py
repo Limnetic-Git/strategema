@@ -13,6 +13,7 @@ class ClientConnection:
         self.world_seed = None
         self.id = None
         self.units_dict = None
+        self.world_changes = []
         
         start_new_thread(self.TCPThread, ())
         start_new_thread(self.UDPThread, ())
@@ -29,7 +30,10 @@ class ClientConnection:
                 print(pack)
             self.TCPChannel.send(f'{pack}')
             
-            incoming_pack = self.TCPChannel.receive(20480, raw=True)
+            incoming_pack = self.TCPChannel.receive(20480, raw=False)
+            for i in incoming_pack:
+                self.world_changes.append(i)
+            
             
 
             self.tasks = ([] if self.tasks == tasks_pack else self.tasks)

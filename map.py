@@ -28,7 +28,12 @@ class World:
         for i in range(team_number):
             bx, by = self.spawn_team(i)
             if i == player.team: player.capital_cords = [bx, by]
-
+            
+    def update(self, client_socket):
+        for change in client_socket.world_changes:
+            self.world_objects[change['x']][change['y']] = change['building']
+            client_socket.world_changes.remove(change)
+            
     def draw(self, window, tl, camera, loaded_map):
         raylib.BeginDrawing()
         raylib.ClearBackground(raylib.BLUE)

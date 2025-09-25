@@ -26,18 +26,19 @@ print(f'World seed: {world.seed}')
 
 camera.focus_camera_to(window, world, player.capital_cords[0], player.capital_cords[1]) #фокусирует камеру на координатах столицы игрока (cм. camera.py)
 
-
 while not raylib.WindowShouldClose():
     loaded_map.update(world) #отвечает за затемнение ласт-лоад зоны
     units_list.update(client_socket.units_dict)
     units_list.update_world_load(world, player, loaded_map)
     world.draw(window, tl, camera, loaded_map) #рисует весь мир
     units_list.draw_all(camera, tl, loaded_map) #рисует всех юнитов
-
+    
 
     camera.drag_to_move(window, world) #позволяет камере перемещаться на СКМ
-    camera.select(units_list, player, client_socket) #позволяет выделять юнитов
-    action_bar.draw() #рисует панельку gui слева-снизу
+    camera.select(window, world, units_list, player, client_socket) #позволяет выделять юнитов
+    camera.build(tl, world, player, client_socket)
+    action_bar.draw(player, camera) #рисует панельку gui слева-снизу
+    world.update(client_socket)
     
     raylib.EndDrawing()
 raylib.CloseWindow()

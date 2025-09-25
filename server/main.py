@@ -23,16 +23,22 @@ def TCPThread(connection):
     processed_tasks_ids = []
     while True:
         incoming_pack = TCPChannel.receive(connection, 20480, raw=False)
+        pack = []
+        
         for task in incoming_pack['tasks']:
             if not task['task_id'] in processed_tasks_ids:
                 if 'unit_id' in task:
                     for unit in units_list.units_list:
                         if unit.id == task['unit_id']:
                             unit.go_to_pos = [task['x'], task['y']]
+                elif 'building' in task:
+                    pack.append(task)
+                    world.world_objects[task['x']][task['y']] = task['building']
+                    
                 processed_tasks_ids.append(task['task_id'])
             
         
-        TCPChannel.send(connection, 'Hi, and i am server! (TCP)')
+        TCPChannel.send(connection, f'{pack}')
         
 def UDPThread():
     while True:

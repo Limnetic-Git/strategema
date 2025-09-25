@@ -7,17 +7,19 @@ class ActionButton:
         self.texture = texture
         self.action = action
         
-    def draw(self, action_bar):
+    def draw(self, player, action_bar, camera):
         raylib.DrawTextureEx(self.texture, (self.x, self.y), 0, 1, raylib.WHITE)
-        self.__check_press(action_bar)
+        self.__check_press(action_bar, camera)
         
-    def __check_press(self, action_bar):
+    def __check_press(self, player, action_bar, camera):
         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
             xm, ym = raylib.GetMouseX(), raylib.GetMouseY()
             if xm >= self.x and xm <= self.x + self.texture.width and ym >= self.y and ym <= self.y + self.texture.height:
                 if self.action == 0: action_bar.page = 1
                 elif self.action == 4: action_bar.page = 0
                 elif self.action == 1: action_bar.page = 2
+                elif self.action == 5: camera.current_building = 4 + player.team
+                elif self.action == 7: camera.current_building = 2
                 else: print('WORK IN PROGRESS')
                 
 class ActionBar:
@@ -40,14 +42,14 @@ class ActionBar:
             ],
                                   ]
         
-    def draw(self):
+    def draw(self, player, camera):
         #raylib.DrawRectangle(15, 850, 500, 280, (28, 28, 28))
         raylib.DrawRectangleRounded([15, 850, 500, 280], 0.3, 10, (28, 28, 28, 200))
     
         raylib.DrawRectangleRounded([25, 860, 480, 280], 0.25, 10, (28, 28, 28, 255))
 
         for button in self.pages_info[self.page]:
-            button.draw(self)
+            button.draw(player, self, camera)
             
         
         
