@@ -75,8 +75,8 @@ class Camera:
                                             client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'unit_id': unit.id,
                                                                                       'x': world_start_x, 'y': world_start_y})                                    
                                             client_socket.tasks_id_counter += 1
-            if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
-                self.__draw_selection_rect(mouse_pos)
+                if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
+                    self.__draw_selection_rect(mouse_pos)
         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
             for unit in units_list.units_list:
                 if unit.selected:
@@ -87,7 +87,7 @@ class Camera:
         if self.current_building:
             mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
             block_to_build = [(self.pos[0] + mouse_pos[0]) // world.block_size, (self.pos[1] + mouse_pos[1]) // world.block_size]
-            raylib.DrawTextureEx(tl['new_city'], (block_to_build[0] * world.block_size - self.pos[0],
+            raylib.DrawTextureEx(tl[self.current_building['type']], (block_to_build[0] * world.block_size - self.pos[0],
                                                                      block_to_build[1] * world.block_size - self.pos[1]), 0, 1, [255, 255, 255, 145])
             
             if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):

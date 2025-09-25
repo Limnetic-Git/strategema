@@ -1,7 +1,7 @@
 import random
 from generate_map import MapGenerator
 from units import Scout
-
+from blocks import blocks_hp
 
 class World:
     def __init__(self, world_size=256, seed=random.randint(0, 99999)):
@@ -19,8 +19,8 @@ class World:
             rx, ry = random.randint(1, self.size-1), random.randint(1, self.size-1)
             if self.world[rx][ry] == 1 and self.world[rx+1][ry] == 1:
                 break
-        self.world_objects[rx][ry] = team_id + 4
-        self.world_objects[rx+1][ry] = 2
+        self.world_objects[rx][ry] = {'type': 'city', 'team': team_id, 'hp': blocks_hp['city']}
+        self.world_objects[rx+1][ry] = {'type': 'metal cluster', 'hp': None}
         return rx, ry
     
     def spawn_teams(self, team_number: int, units_list):

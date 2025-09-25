@@ -34,8 +34,6 @@ class ClientConnection:
             for i in incoming_pack:
                 self.world_changes.append(i)
             
-            
-
             self.tasks = ([] if self.tasks == tasks_pack else self.tasks)
             
     def UDPThread(self):

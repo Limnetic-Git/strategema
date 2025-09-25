@@ -1,4 +1,5 @@
 import math, random
+from blocks import blocks_hp
 
 def neibs(world, x, y):
     a = 0
@@ -124,13 +125,13 @@ class MapGenerator:
             for y in range(self.size):
                 if self.world[x][y] == 1:
                     if random.randint(1, 100) <= 6:
-                        self.world_objects[x][y] = 1
+                        self.world_objects[x][y] = {'type': 'tree', 'hp': blocks_hp['tree']}
                         
     def __generate_metal_clusters(self):
         for _ in range(random.randint(5, 6)):
             rx, ry = random.randint(0, self.size  - 1), random.randint(0, self.size  - 1)
             if self.world[rx][ry] == 1:
-                self.world_objects[rx][ry] = 2
+                self.world_objects[rx][ry] = {'type': 'metal cluster', 'hp': None}
             else:
-                self.world_objects[rx][ry] = 3
+                self.world_objects[rx][ry] = {'type': 'water metal cluster', 'hp': None}
                 

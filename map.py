@@ -2,7 +2,7 @@ import raylib
 import random
 from generate_map import MapGenerator
 from units import *
-
+from blocks import blocks_hp
 
 class World:
     def __init__(self, world_size=256, seed=random.randint(0, 99999)):
@@ -20,8 +20,8 @@ class World:
             rx, ry = random.randint(1, self.size-1), random.randint(1, self.size-1)
             if self.world[rx][ry] == 1 and self.world[rx+1][ry] == 1:
                 break
-        self.world_objects[rx][ry] = team_id + 4
-        self.world_objects[rx+1][ry] = 2
+        self.world_objects[rx][ry] = {'type': 'city', 'team': team_id, 'hp': blocks_hp['city']}
+        self.world_objects[rx+1][ry] = {'type': 'metal_cluster', 'hp': None}
         return rx, ry
     
     def spawn_teams(self, team_number: int, player):
@@ -58,21 +58,15 @@ class World:
                                                 raylib.GREEN
                                                 )
                             raylib.DrawRectangleLines(int(screen_x), int(screen_y), int(self.block_size), int(self.block_size), raylib.BLACK)
-                            
-                    if loaded_map.load_world[x][y][1] == 1:
-                        raylib.DrawTextureEx(tl['tree'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if loaded_map.load_world[x][y][1] == 2:
-                        raylib.DrawTextureEx(tl['metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if loaded_map.load_world[x][y][1] == 3:
-                        raylib.DrawTextureEx(tl['water_metal_cluster'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    if loaded_map.load_world[x][y][1] == 4:
-                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.RED)
-                    if loaded_map.load_world[x][y][1] == 5:
-                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.BLUE)
-                    if loaded_map.load_world[x][y][1] == 6:
-                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.PURPLE)
-                    if loaded_map.load_world[x][y][1] == 7:
-                        raylib.DrawTextureEx(tl['new_city'], (screen_x, screen_y), 0, 1, raylib.YELLOW)
+                    color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
+                    
+                    if isinstance(loaded_map.load_world[x][y][1], dict):
+                        if 'team' in loaded_map.load_world[x][y][1] and loaded_map.load_world[x][y][1]['type'] != 'field':
+                            raylib.DrawTextureEx(tl[loaded_map.load_world[x][y][1]['type']], (screen_x, screen_y), 0, 1,
+                                                 color[loaded_map.load_world[x][y][1]['team']])
+                        else:
+                            raylib.DrawTextureEx(tl[loaded_map.load_world[x][y][1]['type']], (screen_x, screen_y), 0, 1, raylib.WHITE)
+
                         
                     if loaded_map.now_loaded[x][y] == 1:
                         raylib.DrawRectangle(int(screen_x),
