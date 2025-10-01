@@ -13,8 +13,9 @@ world.spawn_teams(4, units_list)
 TreadCount = 0
 print(world_seed)
 
+packs = []
 def TCPThread(connection):
-    global TreadCount, units_list
+    global TreadCount, units_list, packs
     first_pack = {'world_seed': world_seed,
                         'id': TreadCount}
     TreadCount += 1
@@ -23,7 +24,6 @@ def TCPThread(connection):
     processed_tasks_ids = []
     while True:
         incoming_pack = TCPChannel.receive(connection, 20480, raw=False)
-        pack = []
         
         for task in incoming_pack['tasks']:
             if not task['task_id'] in processed_tasks_ids:
@@ -32,12 +32,17 @@ def TCPThread(connection):
                         if unit.id == task['unit_id']:
                             unit.go_to_pos = [task['x'], task['y']]
                 elif 'building' in task:
-                    pack.append(task)
+                    packs.append([task, list(range(4))])
                     world.world_objects[task['x']][task['y']] = task['building']
                     
                 processed_tasks_ids.append(task['task_id'])
             
-        
+        pack = []
+        for i, p in enumerate(packs):
+            if incoming_pack['id'] in p[1]:
+                pack.append(p[0])
+                packs[i][1].remove(incoming_pack['id'])
+                if packs[i][1] == []: packs.pop(i)
         TCPChannel.send(connection, f'{pack}')
         
 def UDPThread():
