@@ -54,4 +54,14 @@ class ActionBar:
             button.draw(self, player, camera)
             
         
+class RecoursesBar:
+    def __init__(self):
+        pass
+    
+    def draw(self, tl, player):
+        raylib.DrawRectangleRounded([1250 + 95, 10, 245, 64], 0.25, 10, (28, 28, 28, 255))
+        
+        raylib.DrawRectangleRounded([1243 + 95, 3, 259, 78], 0.3, 10, (28, 28, 28, 200))
+        raylib.DrawTextureEx(tl['iron'], (1255 + 95, 20), 0, 1, raylib.WHITE)
+        raylib.DrawText(str(player.iron).encode(), 1255 + 95 + 52, 20, 48, raylib.WHITE)
         

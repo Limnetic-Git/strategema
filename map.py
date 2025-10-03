@@ -57,7 +57,10 @@ class World:
                                                 int(self.block_size),
                                                 raylib.GREEN
                                                 )
-                            raylib.DrawRectangleLines(int(screen_x), int(screen_y), int(self.block_size), int(self.block_size), raylib.BLACK)
+                            
+                            if camera.grid:
+                                raylib.DrawRectangleLines(int(screen_x), int(screen_y), int(self.block_size), int(self.block_size), raylib.BLACK)
+                            raylib.DrawRectangleRounded([int(screen_x) + 5, int(screen_y) + 5, int(self.block_size) - 10, int(self.block_size) - 10], 0.3, 10, (28, 28, 28, 35))
                     color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
                     
                     if isinstance(loaded_map.load_world[x][y][1], dict):

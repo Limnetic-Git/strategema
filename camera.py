@@ -7,6 +7,7 @@ class Camera:
         self.is_dragging = False
         self.drag_start_pos = [0, 0]
         self.focus_block = [0, 0]
+        self.grid = True
         
         self.current_building = None
         
@@ -35,7 +36,9 @@ class Camera:
     def select(self, window, world, units_list, player, client_socket):
         if raylib.IsKeyPressed(raylib.KEY_C):
             self.focus_camera_to(window, world, player.capital_cords[0], player.capital_cords[1]) 
-
+        if raylib.IsKeyPressed(raylib.KEY_G):
+            self.grid = not self.grid
+            
         if not raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_MIDDLE):
             
             mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
@@ -66,15 +69,12 @@ class Camera:
                                     
                             else: 
                                 if unit.selected:
-                                    if mouse_pos[1] < 850:
-                                        client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'unit_id': unit.id,
-                                                                                    'x': world_start_x, 'y': world_start_y})    
-                                        client_socket.tasks_id_counter += 1
-                                    else:
-                                        if mouse_pos[0] > 500:
+                                    if mouse_pos[1] > 850 and mouse_pos[0] > 500 or mouse_pos[1] < 850:
+                                        if world_start_x > 0 and world_start_y > 0:
                                             client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'unit_id': unit.id,
-                                                                                      'x': world_start_x, 'y': world_start_y})                                    
+                                                                                        'x': world_start_x, 'y': world_start_y})    
                                             client_socket.tasks_id_counter += 1
+                                        
                 if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
                     self.__draw_selection_rect(mouse_pos)
         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
@@ -86,15 +86,16 @@ class Camera:
     def build(self, tl, world, player, client_socket):
         if self.current_building:
             mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
-            block_to_build = [(self.pos[0] + mouse_pos[0]) // world.block_size, (self.pos[1] + mouse_pos[1]) // world.block_size]
-            raylib.DrawTextureEx(tl[self.current_building['type']], (block_to_build[0] * world.block_size - self.pos[0],
-                                                                     block_to_build[1] * world.block_size - self.pos[1]), 0, 1, [255, 255, 255, 145])
-            
-            if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
-                client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
-                client_socket.tasks_id_counter += 1
-            if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
-                self.current_building = None
+            if mouse_pos[1] > 850 and mouse_pos[0] > 500 or mouse_pos[1] < 850:
+                block_to_build = [(self.pos[0] + mouse_pos[0]) // world.block_size, (self.pos[1] + mouse_pos[1]) // world.block_size]
+                raylib.DrawTextureEx(tl[self.current_building['type']], (block_to_build[0] * world.block_size - self.pos[0],
+                                                                         block_to_build[1] * world.block_size - self.pos[1]), 0, 1, [255, 255, 255, 145])
+                
+                if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
+                    client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
+                    client_socket.tasks_id_counter += 1
+                if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
+                    self.current_building = None
     
     def __draw_selection_rect(self, mouse_pos):
         for i in range(5):

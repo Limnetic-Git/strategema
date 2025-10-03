@@ -5,7 +5,7 @@ from camera import Camera
 from client_socket import ClientConnection
 from textures_lib import TexturesLibrary
 from units import UnitsList
-from gui import ActionBar
+from gui import ActionBar, RecoursesBar
 from player import Player
 from loaded_map import LoadedMap
 
@@ -19,6 +19,7 @@ camera = Camera() #создаёт камеру которую можно дви�
 units_list = UnitsList() 
 tl = TexturesLibrary() #создаёт стеш с текстурами игры. обращаться к текстуре можно как tl['tree'] (см. texture_lib.py)
 action_bar = ActionBar(tl) #создаёт скруглённое темное меню слева снизу, а будет отвечать за весь UI для строительства и изучений (см. gui.py)
+recourses_bar = RecoursesBar()
 player = Player(client_socket.id) #создаёт игрока, хранит информацию о его ресурсах и координатах столицы (см. player.py)
 world.spawn_teams(4, player)
 loaded_map = LoadedMap(world) #хранит прогруженный игроком мир с учетом тумана войны и прогрузки (см. loaded_map.py)
@@ -33,11 +34,11 @@ while not raylib.WindowShouldClose():
     world.draw(window, tl, camera, loaded_map) #рисует весь мир
     units_list.draw_all(camera, tl, loaded_map) #рисует всех юнитов
     
-
     camera.drag_to_move(window, world) #позволяет камере перемещаться на СКМ
     camera.select(window, world, units_list, player, client_socket) #позволяет выделять юнитов
     camera.build(tl, world, player, client_socket)
     action_bar.draw(player, camera) #рисует панельку gui слева-снизу
+    recourses_bar.draw(tl, player)
     world.update(client_socket)
     
     raylib.EndDrawing()
