@@ -15,18 +15,20 @@ class World:
         self.world_objects = world_generator_object.world_objects
         self.block_size = 48
         
-    def spawn_team(self, team_id: int):
+    def spawn_team(self, team_id: int, player):
         while True:
             rx, ry = random.randint(1, self.size-1), random.randint(1, self.size-1)
             if self.world[rx][ry] == 1 and self.world[rx+1][ry] == 1:
                 break
         self.world_objects[rx][ry] = {'type': 'city', 'team': team_id, 'hp': blocks_hp['city']}
+        if team_id == player.team:
+            player.buildings.append((rx, ry))
         self.world_objects[rx+1][ry] = {'type': 'metal_cluster', 'hp': None}
         return rx, ry
     
     def spawn_teams(self, team_number: int, player):
         for i in range(team_number):
-            bx, by = self.spawn_team(i)
+            bx, by = self.spawn_team(i, player)
             if i == player.team: player.capital_cords = [bx, by]
             
     def update(self, client_socket):

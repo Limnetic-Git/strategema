@@ -45,7 +45,6 @@ class ActionBar:
                                   ]
         
     def draw(self, player, camera):
-        #raylib.DrawRectangle(15, 850, 500, 280, (28, 28, 28))
         raylib.DrawRectangleRounded([15, 850, 500, 280], 0.3, 10, (28, 28, 28, 200))
     
         raylib.DrawRectangleRounded([25, 860, 480, 280], 0.25, 10, (28, 28, 28, 255))
@@ -63,5 +62,20 @@ class RecoursesBar:
         
         raylib.DrawRectangleRounded([1243 + 95, 3, 259, 78], 0.3, 10, (28, 28, 28, 200))
         raylib.DrawTextureEx(tl['iron'], (1255 + 95, 20), 0, 1, raylib.WHITE)
-        raylib.DrawText(str(player.iron).encode(), 1255 + 95 + 52, 20, 48, raylib.WHITE)
+        raylib.DrawTextureEx(tl['apple'], (1255 + 215, 20), 0, 1, raylib.WHITE)
+        
+        raylib.DrawText(str(int(player.iron)).encode(), 1255 + 95 + 52, 20, 36, raylib.WHITE)
+        raylib.DrawText(str(int(player.food)).encode(), 1255 + 200 + 67, 20, 36, raylib.WHITE)
+        raylib.DrawText((str(round(player.iron_speed, 2))+'/s').encode(), 1255 + 95 + 58, 55, 20, raylib.WHITE)
+        raylib.DrawText((str(round(player.food_speed, 2))+'/s').encode(), 1255 + 200 + 73, 55, 20, raylib.WHITE)
+        
+class DebugInfoBar:
+    def __init__(self):
+        pass
+    
+    def draw(self, client_socket):
+        current_fps = raylib.GetFPS()
+        raylib.DrawText(str(current_fps).encode(), 3, 3, 20, raylib.WHITE)
+        raylib.DrawText(str(client_socket.tcp_ping).encode(), 3, 25, 20, raylib.WHITE)
+        raylib.DrawText(str(client_socket.udp_ping).encode(), 3, 47, 20, raylib.WHITE)
         

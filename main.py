@@ -5,12 +5,14 @@ from camera import Camera
 from client_socket import ClientConnection
 from textures_lib import TexturesLibrary
 from units import UnitsList
-from gui import ActionBar, RecoursesBar
+from gui import ActionBar, RecoursesBar, DebugInfoBar
 from player import Player
 from loaded_map import LoadedMap
 
 WINDOW_WIDTH = 1600
 WINDOW_HEIGHT = 1000
+tick = 0
+
 
 window = Window(WINDOW_WIDTH, WINDOW_HEIGHT) #создаёт окно X на Y пикселей (см. window.py)
 client_socket = ClientConnection('89.110.90.193', 1234) 
@@ -20,9 +22,12 @@ units_list = UnitsList()
 tl = TexturesLibrary() #создаёт стеш с текстурами игры. обращаться к текстуре можно как tl['tree'] (см. texture_lib.py)
 action_bar = ActionBar(tl) #создаёт скруглённое темное меню слева снизу, а будет отвечать за весь UI для строительства и изучений (см. gui.py)
 recourses_bar = RecoursesBar()
+debug_info_bar = DebugInfoBar()
 player = Player(client_socket.id) #создаёт игрока, хранит информацию о его ресурсах и координатах столицы (см. player.py)
-world.spawn_teams(4, player)
 loaded_map = LoadedMap(world) #хранит прогруженный игроком мир с учетом тумана войны и прогрузки (см. loaded_map.py)
+
+world.spawn_teams(4, player)
+
 print(f'World seed: {world.seed}')
 
 camera.focus_camera_to(window, world, player.capital_cords[0], player.capital_cords[1]) #фокусирует камеру на координатах столицы игрока (cм. camera.py)
@@ -32,14 +37,20 @@ while not raylib.WindowShouldClose():
     units_list.update(client_socket.units_dict)
     units_list.update_world_load(world, player, loaded_map)
     world.draw(window, tl, camera, loaded_map) #рисует весь мир
+    player.update_buildings_info(world)
     units_list.draw_all(camera, tl, loaded_map) #рисует всех юнитов
     
     camera.drag_to_move(window, world) #позволяет камере перемещаться на СКМ
     camera.select(window, world, units_list, player, client_socket) #позволяет выделять юнитов
-    camera.build(tl, world, player, client_socket)
+    camera.build(tl, world, player, client_socket, loaded_map)
     action_bar.draw(player, camera) #рисует панельку gui слева-снизу
     recourses_bar.draw(tl, player)
+    debug_info_bar.draw(client_socket)
     world.update(client_socket)
     
     raylib.EndDrawing()
+    
+    if tick % 60 == 0: player.update_resources()
+    tick += 1
+    
 raylib.CloseWindow()

@@ -83,23 +83,34 @@ class Camera:
                     units_list.selected_units_ids = []
                     unit.selected = False
                     
-    def build(self, tl, world, player, client_socket):
+    def build(self, tl, world, player, client_socket, loaded_map):
         if self.current_building:
             mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
             if mouse_pos[1] > 850 and mouse_pos[0] > 500 or mouse_pos[1] < 850:
                 block_to_build = [(self.pos[0] + mouse_pos[0]) // world.block_size, (self.pos[1] + mouse_pos[1]) // world.block_size]
-                raylib.DrawTextureEx(tl[self.current_building['type']], (block_to_build[0] * world.block_size - self.pos[0],
-                                                                         block_to_build[1] * world.block_size - self.pos[1]), 0, 1, [255, 255, 255, 145])
-                
-                if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
-                    client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
-                    client_socket.tasks_id_counter += 1
+                if loaded_map.now_loaded[block_to_build[0]][block_to_build[1]] == 0:
+                    if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
+                       self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
+                        
+                        raylib.DrawTextureEx(tl[self.current_building['type']], (block_to_build[0] * world.block_size - self.pos[0],
+                                                                             block_to_build[1] * world.block_size - self.pos[1]), 0, 1, [255, 255, 255, 145])
+                    
+                    if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
+                    
+                        if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
+                           self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
+                            
+                            client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
+                            if not (block_to_build[0], block_to_build[1]) in player.buildings:
+                                player.buildings.append((block_to_build[0], block_to_build[1]))
+                            client_socket.tasks_id_counter += 1
+
                 if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
                     self.current_building = None
     
     def __draw_selection_rect(self, mouse_pos):
         for i in range(5):
-            raylib.DrawRectangleLines(int(self.drag_start_pos[0] - i), int(self.drag_start_pos[1] - i),
+            raylib.DrawRectangleLines(int(self.drag_start_pos[0] - i), int(self.drag_start_pos[1] + i),
                                                     int(mouse_pos[0] - self.drag_start_pos[0]), int(mouse_pos[1] - self.drag_start_pos[1]), raylib.YELLOW)
 
             

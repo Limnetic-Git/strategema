@@ -17,7 +17,7 @@ class TexturesLibrary:
         self.textures_library['mine'] = raylib.LoadTexture(b"textures/mine.png")
         self.textures_library['field'] = raylib.LoadTexture(b"textures/field.png")
         self.textures_library['iron'] = raylib.LoadTexture(b"textures/iron.png")
-        
+        self.textures_library['apple'] = raylib.LoadTexture(b"textures/apple.png")
     def __getitem__(self, key):
         return self.textures_library[key]
     
