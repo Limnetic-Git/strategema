@@ -36,7 +36,7 @@ while not raylib.WindowShouldClose():
     loaded_map.update(world) #отвечает за затемнение ласт-лоад зоны
     units_list.update(client_socket.units_dict)
     units_list.update_world_load(world, player, loaded_map)
-    world.draw(window, tl, camera, loaded_map) #рисует весь мир
+    world.draw(window, tl, camera, loaded_map, player) #рисует весь мир
     player.update_buildings_info(world)
     units_list.draw_all(camera, tl, loaded_map) #рисует всех юнитов
     

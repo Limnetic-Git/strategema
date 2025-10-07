@@ -36,7 +36,7 @@ class World:
             self.world_objects[change['x']][change['y']] = change['building']
             client_socket.world_changes.remove(change)
             
-    def draw(self, window, tl, camera, loaded_map):
+    def draw(self, window, tl, camera, loaded_map, player):
         raylib.BeginDrawing()
         raylib.ClearBackground(raylib.BLUE)
 
@@ -79,7 +79,17 @@ class World:
                             int(self.block_size),
                             int(self.block_size),
                             [50, 50, 50, 100])
+                    if isinstance(camera.current_building, dict):
+                        if self.world[x][y] == 1 and self.world_objects[x][y] == 0:
+                            if player.city_borders[x][y] == 1 and camera.current_building['type'] != 'city' or \
+                               player.city_borders[x][y] == 2 and camera.current_building['type'] == 'city':
+                                raylib.DrawRectangle(int(screen_x),
+                                    int(screen_y),
+                                    int(self.block_size),
+                                    int(self.block_size),
+                                    [190, 255, 50, 120])
                 else:
                     raylib.DrawTextureEx(tl['fog'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                    
+                
+        
 

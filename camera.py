@@ -112,5 +112,5 @@ class Camera:
         for i in range(5):
             raylib.DrawRectangleLines(int(self.drag_start_pos[0] - i), int(self.drag_start_pos[1] + i),
                                                     int(mouse_pos[0] - self.drag_start_pos[0]), int(mouse_pos[1] - self.drag_start_pos[1]), raylib.YELLOW)
-
+            
             
