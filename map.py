@@ -42,54 +42,87 @@ class World:
 
         start_x = max(0, int(camera.pos[0] / self.block_size))
         start_y = max(0, int(camera.pos[1] / self.block_size))
-        end_x = min(self.size, start_x + int(window.width / self.block_size) + 2)
-        end_y = min(self.size, start_y + int(window.height / self.block_size) + 2)
+        visible_blocks_x = int(window.width / (self.block_size * camera.zoom)) + 4
+        visible_blocks_y = int(window.height / (self.block_size * camera.zoom)) + 4
+        end_x = min(self.size, start_x + visible_blocks_x)
+        end_y = min(self.size, start_y + visible_blocks_y)
 
         for x in range(start_x, end_x):
             for y in range(start_y, end_y):
+
+                screen_x = round((x * self.block_size - camera.pos[0]) * camera.zoom)
+                screen_y = round((y * self.block_size - camera.pos[1]) * camera.zoom)
+
+                scaled_block_size = round(self.block_size * camera.zoom) + 1
                 
-                screen_x = x * self.block_size - camera.pos[0]
-                screen_y = y * self.block_size - camera.pos[1]
-                if loaded_map.load_world[x][y] != [None, None]:
-                    if -self.block_size < screen_x < window.width and -self.block_size < screen_y < window.height:
+                if (-scaled_block_size < screen_x < window.width + scaled_block_size and 
+                    -scaled_block_size < screen_y < window.height + scaled_block_size):
+                    
+                    if loaded_map.load_world[x][y] != [None, None]:
                         if loaded_map.load_world[x][y][0] == 1:
-                            raylib.DrawRectangle(int(screen_x),
-                                                int(screen_y),
-                                                int(self.block_size),
-                                                int(self.block_size),
+                            raylib.DrawRectangle(screen_x,
+                                                screen_y,
+                                                scaled_block_size,
+                                                scaled_block_size,
                                                 raylib.GREEN
                                                 )
                             
                             if camera.grid:
-                                raylib.DrawRectangleLines(int(screen_x), int(screen_y), int(self.block_size), int(self.block_size), raylib.BLACK)
-                            raylib.DrawRectangleRounded([int(screen_x) + 5, int(screen_y) + 5, int(self.block_size) - 10, int(self.block_size) - 10], 0.3, 10, (28, 28, 28, 35))
-                    color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
-                    
-                    if isinstance(loaded_map.load_world[x][y][1], dict):
-                        if 'team' in loaded_map.load_world[x][y][1] and loaded_map.load_world[x][y][1]['type'] != 'field':
-                            raylib.DrawTextureEx(tl[loaded_map.load_world[x][y][1]['type']], (screen_x, screen_y), 0, 1,
-                                                 color[loaded_map.load_world[x][y][1]['team']])
-                        else:
-                            raylib.DrawTextureEx(tl[loaded_map.load_world[x][y][1]['type']], (screen_x, screen_y), 0, 1, raylib.WHITE)
-
+                                grid_size = round(self.block_size * camera.zoom)
+                                raylib.DrawRectangleLines(screen_x, 
+                                                        screen_y, 
+                                                        grid_size, 
+                                                        grid_size, raylib.BLACK)
+                                
+                            raylib.DrawRectangleRounded([screen_x + 5, 
+                                                       screen_y + 5, 
+                                                       scaled_block_size - 10, 
+                                                       scaled_block_size - 10], 0.3, 10, (28, 28, 28, 35))
                         
-                    if loaded_map.now_loaded[x][y] == 1:
-                        raylib.DrawRectangle(int(screen_x),
-                            int(screen_y),
-                            int(self.block_size),
-                            int(self.block_size),
-                            [50, 50, 50, 100])
-                    if isinstance(camera.current_building, dict):
-                        if self.world[x][y] == 1 and self.world_objects[x][y] == 0:
-                            if player.city_borders[x][y] == 1 and camera.current_building['type'] != 'city' or \
-                               player.city_borders[x][y] == 2 and camera.current_building['type'] == 'city':
-                                raylib.DrawRectangle(int(screen_x),
-                                    int(screen_y),
-                                    int(self.block_size),
-                                    int(self.block_size),
-                                    [190, 255, 50, 120])
-                else:
-                    raylib.DrawTextureEx(tl['fog'], (screen_x, screen_y), 0, 1, raylib.WHITE)
-                
-        
+                        elif loaded_map.load_world[x][y][0] == 0:  # вода
+                            raylib.DrawRectangle(screen_x,
+                                                screen_y,
+                                                scaled_block_size,
+                                                scaled_block_size,
+                                                raylib.BLUE
+                                                )
+                        
+                        color = [raylib.RED, raylib.BLUE, raylib.PURPLE, raylib.YELLOW]
+                        
+                        if isinstance(loaded_map.load_world[x][y][1], dict):
+                            if 'team' in loaded_map.load_world[x][y][1] and loaded_map.load_world[x][y][1]['type'] != 'field':
+                                texture_size = round(self.block_size * camera.zoom) + 1
+                                texture_scale = (self.block_size * camera.zoom + 1) / (self.block_size * camera.zoom)
+                                raylib.DrawTextureEx(tl[loaded_map.load_world[x][y][1]['type']], 
+                                                   (screen_x, screen_y), 
+                                                   0, camera.zoom * texture_scale,
+                                                   color[loaded_map.load_world[x][y][1]['team']])
+                            else:
+                                texture_scale = (self.block_size * camera.zoom + 1) / (self.block_size * camera.zoom)
+                                raylib.DrawTextureEx(tl[loaded_map.load_world[x][y][1]['type']], 
+                                                   (screen_x, screen_y), 
+                                                   0, camera.zoom * texture_scale, raylib.WHITE)
 
+                            
+                        if loaded_map.now_loaded[x][y] == 1:
+                            raylib.DrawRectangle(screen_x,
+                                screen_y,
+                                scaled_block_size,
+                                scaled_block_size,
+                                [50, 50, 50, 100])
+                        if isinstance(camera.current_building, dict):
+                            if self.world[x][y] == 1 and self.world_objects[x][y] == 0:
+                                if player.city_borders[x][y] == 1 and camera.current_building['type'] != 'city' or \
+                                   player.city_borders[x][y] == 2 and camera.current_building['type'] == 'city':
+                                    
+                                    raylib.DrawRectangle(screen_x,
+                                        screen_y,
+                                        scaled_block_size,
+                                        scaled_block_size,
+                                        [190, 255, 50, 120])
+                    else:
+                        fog_size = round(self.block_size * camera.zoom) + 1
+                        fog_scale = (self.block_size * camera.zoom + 1) / (self.block_size * camera.zoom)
+                        raylib.DrawTextureEx(tl['fog'], 
+                                           (screen_x, screen_y), 
+                                           0, camera.zoom * fog_scale, raylib.WHITE)
