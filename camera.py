@@ -50,12 +50,14 @@ class Camera:
    
     
     def focus_camera_to(self, window, world, block_x, block_y):
-        if not hasattr(self, 'default_focus'): 
-            self.default_focus = [(window.width // 2) // world.block_size, 
-                                (window.height // 2) // world.block_size]
-        self.pos = [world.block_size * (block_x - self.default_focus[0]), 
-                   world.block_size * (block_y - self.default_focus[1])]
-    
+        center_world_x = block_x * world.block_size
+        center_world_y = block_y * world.block_size
+        
+        self.pos[0] = center_world_x - (window.width / (2 * self.zoom))
+        self.pos[1] = center_world_y - (window.height / (2 * self.zoom))
+        
+        self.focus_block = [block_x, block_y]
+
     def screen_to_world(self, screen_x, screen_y):
         return [
             self.pos[0] + screen_x / self.zoom,
@@ -128,24 +130,45 @@ class Camera:
                 
                 if 0 <= block_to_build[0] < len(loaded_map.now_loaded) and 0 <= block_to_build[1] < len(loaded_map.now_loaded[0]):
                     if loaded_map.now_loaded[block_to_build[0]][block_to_build[1]] == 0:
-                        if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
-                           self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
-                            
+                        if world.world[block_to_build[0]][block_to_build[1]] != 0:
                             screen_pos = self.world_to_screen(block_to_build[0] * world.block_size, 
                                                             block_to_build[1] * world.block_size)
                             
-                            raylib.DrawTextureEx(tl[self.current_building['type']], 
-                                               (screen_pos[0], screen_pos[1]), 
-                                               0, self.zoom, [255, 255, 255, 145])
-                        
+                            if isinstance(world.world_objects[block_to_build[0]][block_to_build[1]], int):
+                                if self.current_building['type'] != 'mine':
+                                    if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
+                                       self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
+
+                                        raylib.DrawTextureEx(tl[self.current_building['type']], 
+                                                           (screen_pos[0], screen_pos[1]), 
+                                                           0, self.zoom, [255, 255, 255, 145])
+
+                            else:
+                                if self.current_building['type'] == 'mine':
+                                    if world.world_objects[block_to_build[0]][block_to_build[1]]['type'] == 'metal_cluster':
+                                        raylib.DrawTextureEx(tl[self.current_building['type']], 
+                                                           (screen_pos[0], screen_pos[1]), 
+                                                           0, self.zoom, [255, 255, 255, 145])
+              
                         if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
-                            if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
-                               self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
-                                
-                                client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
-                                if not (block_to_build[0], block_to_build[1]) in player.buildings:
-                                    player.buildings.append((block_to_build[0], block_to_build[1]))
-                                client_socket.tasks_id_counter += 1
+                            if world.world[block_to_build[0]][block_to_build[1]] != 0:
+                                if isinstance(world.world_objects[block_to_build[0]][block_to_build[1]], int):
+                                    if self.current_building['type'] != 'mine':
+                                        if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
+                                           self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
+                                            client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
+                                            if not (block_to_build[0], block_to_build[1]) in player.buildings:
+                                                player.buildings.append((block_to_build[0], block_to_build[1]))
+                                            client_socket.tasks_id_counter += 1
+
+
+                                else:
+                                    if self.current_building['type'] == 'mine':
+                                        if world.world_objects[block_to_build[0]][block_to_build[1]]['type'] == 'metal_cluster':
+                                            client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
+                                            if not (block_to_build[0], block_to_build[1]) in player.buildings:
+                                                player.buildings.append((block_to_build[0], block_to_build[1]))
+                                            client_socket.tasks_id_counter += 1
 
                 if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
                     self.current_building = None

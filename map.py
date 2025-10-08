@@ -111,15 +111,23 @@ class World:
                                 scaled_block_size,
                                 [50, 50, 50, 100])
                         if isinstance(camera.current_building, dict):
-                            if self.world[x][y] == 1 and self.world_objects[x][y] == 0:
-                                if player.city_borders[x][y] == 1 and camera.current_building['type'] != 'city' or \
-                                   player.city_borders[x][y] == 2 and camera.current_building['type'] == 'city':
-                                    
-                                    raylib.DrawRectangle(screen_x,
-                                        screen_y,
-                                        scaled_block_size,
-                                        scaled_block_size,
-                                        [190, 255, 50, 120])
+                            if self.world[x][y] == 1:
+                                if self.world_objects[x][y] == 0:
+                                    if player.city_borders[x][y] == 1 and camera.current_building['type'] != 'city' or \
+                                       player.city_borders[x][y] == 2 and camera.current_building['type'] == 'city':
+                                        
+                                        raylib.DrawRectangle(screen_x,
+                                            screen_y,
+                                            scaled_block_size,
+                                            scaled_block_size,
+                                            [190, 255, 50, 120])
+                                elif isinstance(self.world_objects[x][y], dict):
+                                    if self.world_objects[x][y]['type'] == 'metal_cluster' and camera.current_building['type'] == 'mine':
+                                        raylib.DrawRectangle(screen_x,
+                                            screen_y,
+                                            scaled_block_size,
+                                            scaled_block_size,
+                                            [190, 255, 50, 120])
                     else:
                         fog_size = round(self.block_size * camera.zoom) + 1
                         fog_scale = (self.block_size * camera.zoom + 1) / (self.block_size * camera.zoom)

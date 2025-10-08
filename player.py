@@ -42,8 +42,13 @@ class Player:
                         elif world.world_objects[building[0]][building[1]]['type'] == 'mine':
                             self.iron_speed += 0.35
                         elif world.world_objects[building[0]][building[1]]['type'] == 'city':
-                            self.fill_rect(self.city_borders, building[0], building[1], 6, 2)
-                            self.fill_rect(self.city_borders, building[0], building[1], 4, 1)
+                            self.fill_rect(self.city_borders, building[0], building[1], 7, 2)
+        for building in self.buildings:
+            if isinstance(world.world_objects[building[0]][building[1]], dict):
+                if 'team' in world.world_objects[building[0]][building[1]]:
+                    if world.world_objects[building[0]][building[1]]['team'] == self.team:
+                        if world.world_objects[building[0]][building[1]]['type'] == 'city':
+                            self.fill_rect(self.city_borders, building[0], building[1], 5, 1)
                             
     def update_resources(self):
         self.food += self.food_speed
