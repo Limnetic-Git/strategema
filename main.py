@@ -43,11 +43,10 @@ while not raylib.WindowShouldClose():
     camera.drag_to_move(window, world) #позволяет камере перемещаться на СКМ
     camera.select(window, world, units_list, player, client_socket) #позволяет выделять юнитов
     camera.build(tl, world, player, client_socket, loaded_map)
-    action_bar.draw(player, camera) #рисует панельку gui слева-снизу
+    action_bar.draw(player, camera, tl) #рисует панельку gui слева-снизу
     recourses_bar.draw(tl, player)
     debug_info_bar.draw(client_socket)
     world.update(client_socket)
-    
     raylib.EndDrawing()
     
     if tick % 60 == 0: player.update_resources()

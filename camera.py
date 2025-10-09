@@ -1,5 +1,5 @@
 import raylib
-
+from buildings import buildings_cost
 
 class Camera:
     def __init__(self):
@@ -110,7 +110,7 @@ class Camera:
                                     if mouse_pos[1] > 850 and mouse_pos[0] > 500 or mouse_pos[1] < 850:
                                         if world_start_x > 0 and world_start_y > 0:
                                             client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'unit_id': unit.id,
-                                                                                        'x': world_start_x, 'y': world_start_y})    
+                                                                                        'x': int(world_start_x), 'y': int(world_start_y)})    
                                             client_socket.tasks_id_counter += 1
                                         
                 if self.is_dragging and raylib.IsMouseButtonDown(raylib.MOUSE_BUTTON_LEFT):
@@ -122,56 +122,89 @@ class Camera:
                     unit.selected = False
                     
     def build(self, tl, world, player, client_socket, loaded_map):
-        if self.current_building:
-            mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
-            if mouse_pos[1] > 850 and mouse_pos[0] > 500 or mouse_pos[1] < 850:
-                world_pos = self.screen_to_world(mouse_pos[0], mouse_pos[1])
-                block_to_build = [int(world_pos[0] // world.block_size), int(world_pos[1] // world.block_size)]
+        if not self.current_building:
+            return  
+        mouse_pos = [raylib.GetMouseX(), raylib.GetMouseY()]
+        if mouse_pos[1] > 850 and mouse_pos[0] > 500:
+            return
+            
+        world_pos = self.screen_to_world(mouse_pos[0], mouse_pos[1])
+        block_x = int(world_pos[0] // world.block_size)
+        block_y = int(world_pos[1] // world.block_size)
+        block_to_build = [block_x, block_y]
+        
+        if not (0 <= block_x < len(loaded_map.now_loaded) and 
+                0 <= block_y < len(loaded_map.now_loaded[0])):
+            return
                 
-                if 0 <= block_to_build[0] < len(loaded_map.now_loaded) and 0 <= block_to_build[1] < len(loaded_map.now_loaded[0]):
-                    if loaded_map.now_loaded[block_to_build[0]][block_to_build[1]] == 0:
-                        if world.world[block_to_build[0]][block_to_build[1]] != 0:
-                            screen_pos = self.world_to_screen(block_to_build[0] * world.block_size, 
-                                                            block_to_build[1] * world.block_size)
-                            
-                            if isinstance(world.world_objects[block_to_build[0]][block_to_build[1]], int):
-                                if self.current_building['type'] != 'mine':
-                                    if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
-                                       self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
+        if loaded_map.now_loaded[block_x][block_y] != 0:
+            return
+        screen_pos = self.world_to_screen(block_x * world.block_size, 
+                                        block_y * world.block_size)
+        def can_build_regular_building():
+            is_empty_cell = isinstance(world.world_objects[block_x][block_y], int)
+            is_within_city_borders = player.city_borders[block_x][block_y] == 1
+            return is_empty_cell and is_within_city_borders
+        
+        def can_build_city():
+            is_empty_cell = isinstance(world.world_objects[block_x][block_y], int)
+            is_city_expansion_area = player.city_borders[block_x][block_y] == 2
+            return is_empty_cell and is_city_expansion_area
+        
+        def can_build_mine():
+            has_metal_cluster = (not isinstance(world.world_objects[block_x][block_y], int) and 
+                               world.world_objects[block_x][block_y]['type'] == 'metal_cluster')
+            return has_metal_cluster
+        
+        def can_place_building_preview():
+            building_type = self.current_building['type']
+            
+            if building_type == 'mine':
+                return can_build_mine()
+            elif building_type == 'city':
+                return can_build_city()
+            else:
+                return can_build_regular_building()
+        
+        def can_construct_building():
+            building_type = self.current_building['type']
+            
+            if building_type == 'mine':
+                return can_build_mine()
+            elif building_type == 'city':
+                return can_build_city()
+            else:
+                return can_build_regular_building()
+        
+        if world.world[block_x][block_y] != 0 and can_place_building_preview():
+            raylib.DrawTextureEx(tl[self.current_building['type']], 
+                               (screen_pos[0], screen_pos[1]), 
+                               0, self.zoom, [255, 255, 255, 145])
 
-                                        raylib.DrawTextureEx(tl[self.current_building['type']], 
-                                                           (screen_pos[0], screen_pos[1]), 
-                                                           0, self.zoom, [255, 255, 255, 145])
-
-                            else:
-                                if self.current_building['type'] == 'mine':
-                                    if world.world_objects[block_to_build[0]][block_to_build[1]]['type'] == 'metal_cluster':
-                                        raylib.DrawTextureEx(tl[self.current_building['type']], 
-                                                           (screen_pos[0], screen_pos[1]), 
-                                                           0, self.zoom, [255, 255, 255, 145])
-              
-                        if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
-                            if world.world[block_to_build[0]][block_to_build[1]] != 0:
-                                if isinstance(world.world_objects[block_to_build[0]][block_to_build[1]], int):
-                                    if self.current_building['type'] != 'mine':
-                                        if self.current_building['type'] != 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 1 or \
-                                           self.current_building['type'] == 'city' and player.city_borders[block_to_build[0]][block_to_build[1]] == 2:
-                                            client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
-                                            if not (block_to_build[0], block_to_build[1]) in player.buildings:
-                                                player.buildings.append((block_to_build[0], block_to_build[1]))
-                                            client_socket.tasks_id_counter += 1
-
-
-                                else:
-                                    if self.current_building['type'] == 'mine':
-                                        if world.world_objects[block_to_build[0]][block_to_build[1]]['type'] == 'metal_cluster':
-                                            client_socket.tasks.append({'task_id': client_socket.tasks_id_counter, 'building': self.current_building, 'x': block_to_build[0], 'y': block_to_build[1]})                                    
-                                            if not (block_to_build[0], block_to_build[1]) in player.buildings:
-                                                player.buildings.append((block_to_build[0], block_to_build[1]))
-                                            client_socket.tasks_id_counter += 1
-
-                if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
-                    self.current_building = None
+        if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_LEFT):
+            if world.world[block_x][block_y] != 0 and can_construct_building():
+                
+                def complete_building():
+                    task_data = {
+                        'task_id': client_socket.tasks_id_counter,
+                        'building': self.current_building,
+                        'x': block_x,
+                        'y': block_y
+                    }
+                    client_socket.tasks.append(task_data)
+                    if (block_x, block_y) not in player.buildings:
+                        player.buildings.append((block_x, block_y))
+                    
+                    client_socket.tasks_id_counter += 1
+                
+                
+                
+                if self.current_building['type'] != 'field': complete_building()
+                elif player.farms < player.max_farms: complete_building()
+                    
+                
+        if raylib.IsMouseButtonPressed(raylib.MOUSE_BUTTON_RIGHT):
+            self.current_building = None
     
     def __draw_selection_rect(self, mouse_pos):
         start_x = self.drag_start_pos[0]
